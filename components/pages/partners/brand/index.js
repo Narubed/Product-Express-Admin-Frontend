@@ -28,7 +28,7 @@ import ListHead from "@/lib/table/ListHead";
 import ListToolbar from "@/lib/table/ListToolbar";
 import SearchNotFound from "@/lib/table/SearchNotFound";
 import Image from "next/image";
-import DeleteBrand from "./DeleteBrand";
+import DeleteBrand from "@/components/pages/partners/brand/deleteBrand";
 
 const TABLE_HEAD = [
   { id: "Thai", label: "Thai", alignRight: true },

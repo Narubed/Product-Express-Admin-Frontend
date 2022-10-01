@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react";
 import { IconButton } from "@mui/material";
 import Swal from "sweetalert2";
 
-function deleteTypes({ row, fetcherBrand, fetcherWithToken }) {
+function deleteBrand({ row, fetcherBrand, fetcherWithToken }) {
   const onClickDelete = () => {
     Swal.fire({
       title: "ยืนยันการทำรายการ?",
@@ -63,4 +63,4 @@ function deleteTypes({ row, fetcherBrand, fetcherWithToken }) {
   );
 }
 
-export default deleteTypes;
+export default deleteBrand;
