@@ -3,7 +3,10 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ["d-themes.com","localhost"],
+    domains: ["d-themes.com", "localhost"],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
