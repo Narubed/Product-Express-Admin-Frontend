@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet";
 
 import Main from "@/components/main";
 import useCurrentUser from "@/lib/hook/useCurrentUser";
-import BrandCompany from "@/components/pages/partners/brand";
+import BrandCompany from "@/components/pages/partners/brand/index";
 
 function Company() {
   const { currentUser, logout } = useCurrentUser();

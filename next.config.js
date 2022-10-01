@@ -5,9 +5,9 @@ const nextConfig = {
   images: {
     domains: ["d-themes.com", "localhost"],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // eslint: {
+  //   ignoreDuringBuilds: true,
+  // },
 };
 
 module.exports = nextConfig;
