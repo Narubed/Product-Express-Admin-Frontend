@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Card from "~/components/features/accordion/card";
-
+import useCurrentUser from "@/lib/hook/useCurrentUser";
 import { mainMenu } from "~/utils/data/menu";
 
 function MobileMenu(props) {
+  const { logout } = useCurrentUser();
   const [search, setSearch] = useState("");
   const [timer, setTimer] = useState(null);
   const router = useRouter();
@@ -100,14 +101,35 @@ function MobileMenu(props) {
               <a>Home</a>
             </Link>
           </li>
+          <li>
+            <Card title="สินค้าของบริษัท" type="mobile" url="/pages/about-us">
+              <ul>
+                {mainMenu.products.map((item, index) => (
+                  <div key={`other-${item.title}`}>
+                    <Link href={"/" + item.url}>
+                      <a>
+                        {item.title}
+                        {item.new && <span className="tip tip-new">New</span>}
+                        {item.hot ? (
+                          <span className="tip tip-hot">Hot</span>
+                        ) : (
+                          ""
+                        )}
+                      </a>
+                    </Link>
+                  </div>
+                ))}
+              </ul>
+            </Card>
+          </li>
 
           <li>
-            <Card title="categories" type="mobile" url="/shop">
+            <Card title="พาร์ทเนอร์" type="mobile" url="/partners">
               <ul>
                 <li>
-                  <Card title="Variations 1" type="mobile">
+                  <Card title="ร้านพาร์ทเนอร์ (store)" type="mobile">
                     <ul>
-                      {mainMenu.shop.variation1.map((item, index) => (
+                      {mainMenu.partners.variation1.map((item, index) => (
                         <div key={item.title}>
                           <Link href={"/" + item.url}>
                             <a>
@@ -125,9 +147,9 @@ function MobileMenu(props) {
                   </Card>
                 </li>
                 <li>
-                  <Card title="Variations 2" type="mobile">
+                  <Card title="บริษัทพาร์ทเนอร์ (Company)" type="mobile">
                     <ul>
-                      {mainMenu.shop.variation2.map((item, index) => (
+                      {mainMenu.partners.variation2.map((item, index) => (
                         <div key={item.title}>
                           <Link href={"/" + item.url}>
                             <a>
@@ -276,6 +298,11 @@ function MobileMenu(props) {
 
           <li>
             <Link href="/">Buy Riode!</Link>
+          </li>
+          <li>
+            <a onClick={logout} style={{ cursor: "pointer" }}>
+              ออกจากระบบ
+            </a>
           </li>
         </ul>
       </div>

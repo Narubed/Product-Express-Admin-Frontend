@@ -1,11 +1,13 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-
+import { Icon } from "@iconify/react";
 import { mainMenu } from "~/utils/data/menu";
+import useCurrentUser from "@/lib/hook/useCurrentUser";
+import Image from "next/image";
 
 function MainMenu() {
   const pathname = useRouter().pathname;
-
+  const { logout } = useCurrentUser();
   return (
     <nav className="main-nav mr-4">
       <ul className="menu menu-active-underline">
@@ -15,20 +17,47 @@ function MainMenu() {
           </Link>
         </li>
 
-        <li
-          className={`submenu  ${pathname.includes("/shop") ? "active" : ""}`}
-        >
-          <Link href="/shop">
-            <a>Categories</a>
+        <li className={`${pathname.includes("/products") ? "active" : ""}`}>
+          <Link href="#">
+            <a style={{ display: "flex" }}>
+              สินค้าของบริษัท
+              <a style={{ paddingTop: "12px" }}>
+                <Icon icon="dashicons:arrow-down-alt2" width="14" height="14" />
+              </a>
+            </a>
+          </Link>
+
+          <ul style={{ marginLeft: "-50px" }}>
+            {mainMenu.products.map((item, index) => (
+              <li key={`other-${item.title}`}>
+                <Link href={"/" + item.url}>
+                  <a>
+                    {item.title}
+                    {item.new ? <span className="tip tip-new">New</span> : ""}
+                    {item.hot ? <span className="tip tip-hot">Hot</span> : ""}
+                  </a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </li>
+        <li className={`  ${pathname.includes("/partners") ? "active" : ""}`}>
+          <Link href="/partners">
+            <a style={{ display: "flex" }}>
+              พาร์ทเนอร์
+              <a style={{ paddingTop: "12px" }}>
+                <Icon icon="dashicons:arrow-down-alt2" width="14" height="14" />
+              </a>
+            </a>
           </Link>
 
           <div className="megamenu" style={{ marginLeft: "-150px" }}>
             <div className="row">
               <div className="col-6 col-sm-4 col-md-3 col-lg-4">
-                <h4 className="menu-title">Variations 1</h4>
+                <h4 className="menu-title">ร้านพาร์ทเนอร์ (store)</h4>
                 <ul>
-                  {mainMenu.shop.variation1.map((item, index) => (
-                    <li key={`shop-${item.title}`}>
+                  {mainMenu.partners.variation1.map((item, index) => (
+                    <li key={`partners-${item.title}`}>
                       <Link href={"/" + item.url}>
                         <a>
                           {item.title}
@@ -45,10 +74,10 @@ function MainMenu() {
               </div>
 
               <div className="col-6 col-sm-4 col-md-3 col-lg-4">
-                <h4 className="menu-title">Variations 2</h4>
+                <h4 className="menu-title">บริษัทพาร์ทเนอร์</h4>
                 <ul>
-                  {mainMenu.shop.variation2.map((item, index) => (
-                    <li key={`shop-${item.title}`}>
+                  {mainMenu.partners.variation2.map((item, index) => (
+                    <li key={`partners-${item.title}`}>
                       <Link href={"/" + item.url}>
                         <a>
                           {item.title}
@@ -65,8 +94,8 @@ function MainMenu() {
               </div>
               <div className="col-6 col-sm-4 col-md-3 col-lg-4 menu-banner menu-banner1 banner banner-fixed">
                 <figure>
-                  <img
-                    src="./images/menu/banner-1.jpg"
+                  <Image
+                    src="https://d-themes.com/react/riode/demo-medical/images/menu/banner-1.jpg"
                     alt="Menu banner"
                     width="221"
                     height="330"
@@ -145,8 +174,8 @@ function MainMenu() {
 
               <div className="col-6 col-sm-4 col-md-3 col-lg-4 menu-banner menu-banner2 banner banner-fixed">
                 <figure>
-                  <img
-                    src="./images/menu/banner-2.jpg"
+                  <Image
+                    src="https://d-themes.com/react/riode/demo-medical/images/menu/banner-2.jpg"
                     alt="Menu banner"
                     width="221"
                     height="330"
@@ -229,6 +258,11 @@ function MainMenu() {
           <Link href="/pages/about-us">
             <a>About Us</a>
           </Link>
+        </li>
+        <li>
+          <a onClick={logout} style={{ cursor: "pointer" }}>
+            ออกจากระบบ
+          </a>
         </li>
       </ul>
     </nav>

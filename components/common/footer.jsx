@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -9,8 +10,8 @@ export default function Footer() {
             <div className="col-lg-2 d-flex align-items-center">
               <Link href="/">
                 <div className="logo-footer mb-5">
-                  <img
-                    src="./images/home/logo-footer.png"
+                  <Image
+                    src="https://d-themes.com/react/riode/demo-19/images/home/logo-footer.png"
                     alt="logo-footer"
                     width="154"
                     height="43"
@@ -139,8 +140,8 @@ export default function Footer() {
           </div>
           <div className="footer-right">
             <figure className="d-flex">
-              <img
-                src="images/home/payment.png"
+              <Image
+                src="https://d-themes.com/react/riode/demo-medical/images/home/payment.png"
                 alt="payment"
                 width="272"
                 height="20"

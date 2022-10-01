@@ -6,14 +6,18 @@ import "react-toastify/dist/ReactToastify.min.css";
 // import 'react-image-lightbox/style.css';
 // import 'react-input-range/lib/css/index.css';
 
+import { useDispatch } from "react-redux";
+import { setToken } from "@/lib/store/session";
+import useCurrentUser from "@/lib/hook/useCurrentUser";
+
 import Link from "next/link";
 
-import Header from '~/components/common/header';
-import Footer from '~/components/common/footer';
+import Header from "~/components/common/header";
+import Footer from "~/components/common/footer";
 // import StickyFooter from '~/components/common/sticky-footer';
 // import Quickview from '~/components/features/product/common/quickview-modal';
 // import VideoModal from '~/components/features/modals/video-modal';
-import MobileMenu from '~/components/common/partials/mobile-menu';
+import MobileMenu from "~/components/common/partials/mobile-menu";
 
 // import { modalActions } from "~/store/modal";
 
@@ -26,6 +30,12 @@ import {
 
 function Layout({ children, closeQuickview }) {
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const jwt = localStorage.getItem("jwt");
+    dispatch(setToken(jwt));
+  }, []);
 
   useLayoutEffect(() => {
     document.querySelector("body").classList.remove("loaded");
@@ -60,45 +70,46 @@ function Layout({ children, closeQuickview }) {
     }, 50);
   }, [router.pathname]);
 
+  const { currentUser, logout } = useCurrentUser();
+
   return (
     <>
-      <div className="page-wrapper">
-        <Header />
+      {currentUser ? (
+        <>
+          <div className="page-wrapper">
+            <Header />
 
-        {children}
+            {children}
 
-        <Footer />
+            <Footer />
 
-        {/* <StickyFooter /> */}
-      </div>
-
-      <button
-        id="scroll-top"
-        href="#"
-        title="Top"
-        role="button"
-        className="scroll-top"
-        onClick={() => scrollTopHandler(false)}
-      >
-        <i className="d-icon-arrow-up"></i>
-      </button>
-
-      <MobileMenu />
-
-      <ToastContainer
-        autoClose={3000}
-        duration={300}
-        newestOnTo={true}
-        className="toast-container"
-        position="bottom-left"
-        closeButton={false}
-        hideProgressBar={true}
-        newestOnTop={true}
-      />
-
-      {/* <Quickview /> */}
-
-      {/* <VideoModal /> */}
+            {/* <StickyFooter /> */}
+          </div>
+          <button
+            id="scroll-top"
+            href="#"
+            title="Top"
+            role="button"
+            className="scroll-top"
+            onClick={() => scrollTopHandler(false)}
+          >
+            <i className="d-icon-arrow-up"></i>
+          </button>
+          <MobileMenu />
+          <ToastContainer
+            autoClose={3000}
+            duration={300}
+            newestOnTo={true}
+            className="toast-container"
+            position="bottom-left"
+            closeButton={false}
+            hideProgressBar={true}
+            newestOnTop={true}
+          />
+        </>
+      ) : (
+        <div>{children}</div>
+      )}
     </>
   );
 }

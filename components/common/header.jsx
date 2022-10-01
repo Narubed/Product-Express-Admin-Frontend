@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-
+import { Icon } from "@iconify/react";
 import Link from "next/link";
 // import CartMenu from "~/components/common/partials/cart-menu";
 import MainMenu from "~/components/common/partials/main-menu";
+import Image from "next/image";
 // import SearchBox from "~/components/common/partials/search-box";
 // import LoginModal from "~/components/features/modals/login-modal";
 
@@ -69,18 +70,20 @@ export default function Header(props) {
         <div className="container">
           <div className="header-left">
             <Link href="#">
-              <a
-                className="mobile-menu-toggle mr-0"
-                onClick={showMobileMenu}
-              >
-                <i className="d-icon-bars2"></i>
+              <a className="mobile-menu-toggle mr-0" onClick={showMobileMenu}>
+                {/* <i className="d-icon-bars2"></i> */}
+                <div style={{ display: "flex", alignItem: "center" }}>
+                  <Icon icon="uis:subject" width="36px" height="36px" />
+                </div>
+
+                {/* <button onClick={showMobileMenu}>152</button> */}
               </a>
             </Link>
 
             <Link href="/">
               <a className="logo d-none d-lg-block">
-                <img
-                  src="./images/home/logo.png"
+                <Image
+                  src="https://d-themes.com/react/riode/demo-19/images/home/logo.png"
                   alt="logo"
                   width="154"
                   height="43"
@@ -92,8 +95,8 @@ export default function Header(props) {
           <div className="header-center d-flex justify-content-center">
             <Link href="/">
               <a className="logo d-block d-lg-none">
-                <img
-                  src="images/home/logo.png"
+                <Image
+                  src="https://d-themes.com/react/riode/demo-19/images/home/logo.png"
                   alt="logo"
                   width="154"
                   height="43"

@@ -14,6 +14,7 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          <link rel="icon" href="/images/icons/favicon.png" />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900"
@@ -33,7 +34,6 @@ class MyDocument extends Document {
             type="text/css"
             href="vendor/owl-carousel/owl.carousel.min.css"
           />
-          <link rel="icon" href="images/icons/favicon.png" />
         </Head>
         <body>
           <Main />

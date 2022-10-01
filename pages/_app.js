@@ -3,6 +3,7 @@ import store from "@/lib/store/store";
 
 import { Provider } from "react-redux";
 import Helmet from "react-helmet";
+
 import Layout from "~/components/layout";
 
 function MyApp({ Component, pageProps }) {
