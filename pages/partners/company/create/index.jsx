@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import useCurrentUser from "@/lib/hook/useCurrentUser";
 import { LoadingButton } from "@mui/lab";
 import { useSelector, useDispatch } from "react-redux";
+import { setLoading } from "@/lib/store/loading";
 import { Helmet } from "react-helmet";
 
 import {
@@ -80,7 +81,7 @@ export default function edit() {
   const { fetcherWithToken, currentUser } = useCurrentUser();
   const token = useSelector((state) => state.session.token);
   const router = useRouter();
-
+  const dispatch = useDispatch();
   const [values, setValues] = useState({
     Thai: "",
     Eng: "",
@@ -109,6 +110,8 @@ export default function edit() {
       token,
       setImgSrc,
       setfile,
+      setLoading,
+      dispatch,
     });
   };
 

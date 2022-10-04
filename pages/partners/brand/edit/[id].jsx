@@ -32,7 +32,7 @@ import { styled } from "@mui/material/styles";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import Main from "@/components/main";
-
+import { setLoading } from "@/lib/store/loading";
 import iconEng from "~/public/static/icons/Eng.png";
 import iconThai from "~/public/static/icons/Thai.png";
 import iconCambodia from "~/public/static/icons/Cambodia.png";
@@ -71,7 +71,7 @@ export default function edit() {
   const token = useSelector((state) => state.session.token);
   const router = useRouter();
   const { query } = router;
-
+  const dispatch = useDispatch();
   const [values, setValues] = useState({
     BrandImage: "",
     CompanyId: "",
@@ -103,6 +103,8 @@ export default function edit() {
       query,
       router,
       token,
+      setLoading,
+      dispatch,
     });
   };
 

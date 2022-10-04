@@ -124,7 +124,7 @@ function MobileMenu(props) {
           </li>
 
           <li>
-            <Card title="พาร์ทเนอร์" type="mobile" url="/partners">
+            <Card title="พาร์ทเนอร์" type="mobile" url="/partners/store">
               <ul>
                 <li>
                   <Card title="ร้านพาร์ทเนอร์ (store)" type="mobile">

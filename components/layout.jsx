@@ -18,6 +18,7 @@ import Footer from "~/components/common/footer";
 // import Quickview from '~/components/features/product/common/quickview-modal';
 // import VideoModal from '~/components/features/modals/video-modal';
 import MobileMenu from "~/components/common/partials/mobile-menu";
+import Loading from "@/components/common/loading";
 
 // import { modalActions } from "~/store/modal";
 
@@ -77,6 +78,7 @@ function Layout({ children, closeQuickview }) {
       {currentUser ? (
         <>
           <div className="page-wrapper">
+            <Loading />
             <Header />
 
             {children}

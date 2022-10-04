@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import useCurrentUser from "@/lib/hook/useCurrentUser";
 import { LoadingButton } from "@mui/lab";
 import { useSelector, useDispatch } from "react-redux";
+import { setLoading } from "@/lib/store/loading";
 import { Helmet } from "react-helmet";
 
 import {
@@ -80,6 +81,7 @@ export default function edit() {
   const token = useSelector((state) => state.session.token);
   const router = useRouter();
   const { query } = router;
+  const dispatch = useDispatch();
   const [values, setValues] = useState({
     CompanyImage: "",
     Thai: "",
@@ -140,7 +142,9 @@ export default function edit() {
       file,
       query,
       router,
-      token
+      token,
+      setLoading,
+      dispatch,
     });
   };
 

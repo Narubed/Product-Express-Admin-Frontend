@@ -1,6 +1,7 @@
-import React from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
+
+//
 export default function componentName({
   values,
   setValues,
@@ -9,6 +10,8 @@ export default function componentName({
   query,
   router,
   token,
+  dispatch,
+  setLoading,
 }) {
   if (
     !values.Thai ||
@@ -45,6 +48,7 @@ export default function componentName({
       cancelButtonText: "ยกเลิก",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        dispatch(setLoading(true));
         let data = {};
         const urlImage = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/image/brand`;
         const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/brand/${query.id}`;
@@ -117,6 +121,7 @@ export default function componentName({
           body: JSON.stringify(data),
         })
           .then(() => {
+            dispatch(setLoading(false));
             Swal.fire({
               icon: "success",
               showConfirmButton: false,
@@ -127,6 +132,7 @@ export default function componentName({
             }, 1500);
           })
           .catch(() => {
+            dispatch(setLoading(false));
             Swal.fire({
               icon: "error",
               title: "ไม่สามารถแก้ไขข้อมูลนี้ได้",

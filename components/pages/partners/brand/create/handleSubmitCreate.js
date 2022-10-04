@@ -1,6 +1,10 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
+
+//
+
 export default function componentName({
   values,
   setValues,
@@ -9,6 +13,8 @@ export default function componentName({
   token,
   setImgSrc,
   setfile,
+  dispatch,
+  setLoading,
 }) {
   if (
     file.length === 0 ||
@@ -46,6 +52,7 @@ export default function componentName({
       cancelButtonText: "ยกเลิก",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        dispatch(setLoading(true));
         const urlImage = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/image/brand`;
         const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/brand`;
         const responseFile = await axios({
@@ -82,6 +89,7 @@ export default function componentName({
           body: JSON.stringify(data),
         })
           .then(() => {
+            dispatch(setLoading(false));
             Swal.fire({
               icon: "success",
               showConfirmButton: false,
@@ -107,6 +115,7 @@ export default function componentName({
             }, 500);
           })
           .catch(() => {
+            dispatch(setLoading(false));
             Swal.fire({
               icon: "error",
               title: "ไม่สามารถเพิ่มข้อมูลนี้ได้",

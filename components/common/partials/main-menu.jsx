@@ -42,7 +42,7 @@ function MainMenu() {
           </ul>
         </li>
         <li className={`  ${pathname.includes("/partners") ? "active" : ""}`}>
-          <Link href="/partners">
+          <Link href="/partners/store">
             <a style={{ display: "flex" }}>
               พาร์ทเนอร์
               <a style={{ paddingTop: "12px" }}>

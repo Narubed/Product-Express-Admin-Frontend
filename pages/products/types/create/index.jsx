@@ -6,6 +6,7 @@ import useCurrentUser from "@/lib/hook/useCurrentUser";
 import { LoadingButton } from "@mui/lab";
 import { useSelector, useDispatch } from "react-redux";
 import { Helmet } from "react-helmet";
+import { setLoading } from "@/lib/store/loading";
 
 import {
   Stack,
@@ -79,7 +80,7 @@ export default function edit() {
   const { fetcherWithToken, currentUser } = useCurrentUser();
   const token = useSelector((state) => state.session.token);
   const router = useRouter();
-
+  const dispatch = useDispatch();
   const [values, setValues] = useState({
     Thai: "",
     Eng: "",
@@ -123,6 +124,7 @@ export default function edit() {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
+          dispatch(setLoading(true));
           const urlImage = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/image/type`;
           const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/type`;
           const responseFile = await axios({
@@ -151,6 +153,7 @@ export default function edit() {
             body: JSON.stringify(data),
           })
             .then(() => {
+              dispatch(setLoading(false));
               Swal.fire({
                 icon: "success",
                 showConfirmButton: false,
@@ -170,6 +173,7 @@ export default function edit() {
               }, 1500);
             })
             .catch(() => {
+              dispatch(setLoading(false));
               Swal.fire({
                 icon: "error",
                 title: "ไม่สามารถเพิ่มข้อมูลนี้ได้",

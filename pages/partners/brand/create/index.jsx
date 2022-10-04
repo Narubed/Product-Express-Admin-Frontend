@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import useCurrentUser from "@/lib/hook/useCurrentUser";
 import { LoadingButton } from "@mui/lab";
 import { useSelector, useDispatch } from "react-redux";
+import { setLoading } from "@/lib/store/loading";
+
 import { Helmet } from "react-helmet";
 
 import {
@@ -32,7 +34,6 @@ import { styled } from "@mui/material/styles";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import Main from "@/components/main";
-
 import iconEng from "~/public/static/icons/Eng.png";
 import iconThai from "~/public/static/icons/Thai.png";
 import iconCambodia from "~/public/static/icons/Cambodia.png";
@@ -81,6 +82,7 @@ export default function edit() {
   const { fetcherWithToken, currentUser } = useCurrentUser();
   const token = useSelector((state) => state.session.token);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [values, setValues] = useState({
     CompanyId: "",
@@ -111,6 +113,8 @@ export default function edit() {
       token,
       setImgSrc,
       setfile,
+      setLoading,
+      dispatch,
     });
   };
 

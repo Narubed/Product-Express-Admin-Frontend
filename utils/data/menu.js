@@ -22,12 +22,12 @@ export const mainMenu = {
   partners: {
     variation1: [
       {
-        title: "Banner With Sidebar",
-        url: "partners/banner-sidebar",
+        title: "พาร์ทเนอร์ (Store)",
+        url: "partners/store",
       },
       {
-        title: "Banner With Sidebar",
-        url: "partners/banner-sidebar",
+        title: "เพิ่มพาร์ทเนอร์ (Store)",
+        url: "partners/store/create",
       },
     ],
     variation2: [

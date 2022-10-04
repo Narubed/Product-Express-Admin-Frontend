@@ -5,15 +5,23 @@ export default function componentName({
   values,
   setValues,
   fetcherWithToken,
-  file,
+  fileCard,
+  fileBookBank,
   token,
-  setImgSrc,
-  setfile,
-  dispatch,
+  setImgSrcCard,
+  setfileCard,
+  setImgSrcBookBank,
+  setfileBookBank,
   setLoading,
+  dispatch,
 }) {
   if (
-    file.length === 0 ||
+    fileCard.length === 0 ||
+    fileBookBank.length === 0 ||
+    !values.name ||
+    !values.email ||
+    !values.password ||
+    !values.phone ||
     !values.Thai ||
     !values.Eng ||
     !values.Cambodia ||
@@ -35,7 +43,8 @@ export default function componentName({
     });
   } else {
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("partner_card_image", fileCard);
+    formData.append("partner_bookbank_image", fileBookBank);
     Swal.fire({
       title: "ยืนยันการทำรายการ?",
       text: "กรุณาเช็คข้อมูลก่อนยืนยันการเพิ่มข้อมูล!",
@@ -48,8 +57,8 @@ export default function componentName({
     }).then(async (result) => {
       if (result.isConfirmed) {
         dispatch(setLoading(true));
-        const urlImage = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/image/company`;
-        const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/company`;
+        const urlImage = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/image2/partners`;
+        const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/partners`;
         const responseFile = await axios({
           method: "POST",
           url: urlImage,
@@ -59,9 +68,20 @@ export default function componentName({
             "auth-token": `Bearer ${token}`,
           },
         });
+        console.log(responseFile.data.bookbankImage);
+        console.log(responseFile.data.cardImage);
+
+        // console.log(responseFileCard.data.filename);
+        // console.log(responseFileBookBank.data.filename);
         const data = {
-          company_image: responseFile.data.filename,
-          company_name: {
+          partner_name: values.name,
+          partner_email: values.email,
+          partner_password: values.password,
+          partner_card_image: responseFile.data.cardImage,
+          partner_bookbank_image: responseFile.data.bookbankImage,
+          partner_status: values.status,
+          partner_phone: values.phone,
+          partner_address: {
             Thai: values.Thai,
             Eng: values.Eng,
             Cambodia: values.Cambodia,
@@ -69,7 +89,7 @@ export default function componentName({
             Laos: values.Laos,
             China: values.China,
           },
-          company_address: {
+          partner_name_center: {
             Thai: values.AddressThai,
             Eng: values.AddressEng,
             Cambodia: values.AddressCambodia,
@@ -91,12 +111,19 @@ export default function componentName({
             });
             setTimeout(() => {
               setValues({
+                name: "",
+                email: "",
+                password: "",
+                status: true,
+                phone: "",
+
                 Thai: "",
                 Eng: "",
                 Cambodia: "",
                 Myanmar: "",
                 Laos: "",
                 China: "",
+
                 AddressThai: "",
                 AddressEng: "",
                 AddressCambodia: "",
@@ -104,8 +131,11 @@ export default function componentName({
                 AddressLaos: "",
                 AddressChina: "",
               });
-              setImgSrc(null);
-              setfile([]);
+
+              setImgSrcCard(null);
+              setImgSrcBookBank(null);
+              setfileCard([]);
+              setfileBookBank([]);
             }, 500);
           })
           .catch(() => {

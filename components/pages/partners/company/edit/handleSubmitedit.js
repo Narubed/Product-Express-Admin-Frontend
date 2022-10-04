@@ -12,6 +12,8 @@ export default function componentName({
   query,
   router,
   token,
+  dispatch,
+  setLoading,
 }) {
   if (
     !values.Thai ||
@@ -47,6 +49,7 @@ export default function componentName({
       cancelButtonText: "ยกเลิก",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        dispatch(setLoading(true));
         let data = {};
         const urlImage = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/image/company`;
         const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/company/${query.id}`;
@@ -117,6 +120,7 @@ export default function componentName({
           body: JSON.stringify(data),
         })
           .then(() => {
+            dispatch(setLoading(false));
             Swal.fire({
               icon: "success",
               showConfirmButton: false,
@@ -127,6 +131,7 @@ export default function componentName({
             }, 1500);
           })
           .catch(() => {
+            dispatch(setLoading(false));
             Swal.fire({
               icon: "error",
               title: "ไม่สามารถเพิ่มข้อมูลนี้ได้",
