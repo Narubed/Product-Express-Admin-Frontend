@@ -83,9 +83,8 @@ export default function LoginForm() {
         showConfirmButton: false,
         timer: 1500,
       });
-      setTimeout(() => {
-        router.replace("/");
-      }, 1500);
+
+      router.replace("/");
     }
   };
 

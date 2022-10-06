@@ -28,26 +28,16 @@ import {
   Switch,
   Autocomplete,
 } from "@mui/material";
-import { Icon } from "@iconify/react";
 import { styled } from "@mui/material/styles";
-import dayjs from "dayjs";
-import Swal from "sweetalert2";
+
 import Main from "@/components/main";
 
-import iconEng from "~/public/static/icons/Eng.png";
-import iconThai from "~/public/static/icons/Thai.png";
-import iconCambodia from "~/public/static/icons/Cambodia.png";
-import iconMyanmar from "~/public/static/icons/Myanmar.png";
-import iconLaos from "~/public/static/icons/Laos.png";
-import iconChina from "~/public/static/icons/China.png";
-
-import imagesicon from "~/public/product-express/NoImage.png";
 import axios from "axios";
 
-import FormInput from "~/components/pages/products/create/formInput";
+import FormInput from "~/components/pages/products/edit/formInput";
 import ChangeImages from "~/components/pages/products/create/changeImages";
-import CardSizeDetail from "~/components/pages/products/create/cardSizeDetail";
-import HeaderSubmitCreate from "@/components/pages/products/create/handleSubmitCreate";
+import CardSizeDetail from "~/components/pages/products/edit/cardSizeDetail";
+import HandleSubmitEdit from "@/components/pages/products/edit/handleSubmitEdit";
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
@@ -62,6 +52,7 @@ export default function edit() {
   const token = useSelector((state) => state.session.token);
   const router = useRouter();
   const dispatch = useDispatch();
+  const { query } = router;
   const [values, setValues] = useState({
     Thai: "",
     Eng: "",
@@ -94,6 +85,53 @@ export default function edit() {
   const [isCardSizeDetail, setCardSizeDetail] = useState([]);
   const [count, setCount] = useState(0);
 
+  useEffect(() => {
+    if (currentUser) {
+      fetcherProducts();
+    }
+  }, [currentUser]);
+
+  const fetcherProducts = async () => {
+    const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/products/${query.id}`;
+    await fetcherWithToken(url)
+      .then((json) => {
+        setFile(json.data.product_images);
+        setCardSizeDetail(json.data.product_size_detail);
+
+        setValues({
+          ...values,
+          Thai: json.data.product_name.Thai,
+          Eng: json.data.product_name.Eng,
+          Cambodia: json.data.product_name.Cambodia,
+          Myanmar: json.data.product_name.Myanmar,
+          Laos: json.data.product_name.Laos,
+          China: json.data.product_name.China,
+
+          DetailThai: json.data.product_detail.Thai,
+          DetailEng: json.data.product_detail.Eng,
+          DetailCambodia: json.data.product_detail.Cambodia,
+          DetailMyanmar: json.data.product_detail.Myanmar,
+          DetailLaos: json.data.product_detail.Laos,
+          DetailChina: json.data.product_detail.China,
+
+          SizeNameThai: json.data.product_size_name.Thai,
+          SizeNameEng: json.data.product_size_name.Eng,
+          SizeNameCambodia: json.data.product_size_name.Cambodia,
+          SizeNameMyanmar: json.data.product_size_name.Myanmar,
+          SizeNameLaos: json.data.product_size_name.Laos,
+          SizeNameChina: json.data.product_size_name.China,
+
+          BrandId: json.data.product_brand_id,
+          Status: true,
+          TypeId: json.data.product_type_id,
+          Tag: json.data.product_tag,
+        });
+      })
+      .catch((err) => {
+        router.push("/404");
+      });
+  };
+
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
@@ -123,7 +161,7 @@ export default function edit() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    HeaderSubmitCreate({
+    HandleSubmitEdit({
       values,
       setValues,
       fetcherWithToken,
@@ -134,6 +172,7 @@ export default function edit() {
       setLoading,
       isCardSizeDetail,
       router,
+      query,
     });
     console.log(values);
     console.log(isFile);
@@ -145,13 +184,13 @@ export default function edit() {
   return (
     <div className="main home">
       <Helmet>
-        <title>เพิ่มสินค้าใหม่</title>
+        <title>แก้ไขสินค้า</title>
       </Helmet>
 
-      <h1 className="d-none">สินค้าให่เพิ่มสินค้าใหม่ - admin</h1>
+      <h1 className="d-none">แก้ไขสินค้า - admin</h1>
       <Container sx={{ pb: "8%", pt: "4%" }}>
         <Typography variant="h4" gutterBottom sx={{ mt: "16px" }}>
-          เพิ่มสินค้าใหม่
+          แก้ไขสินค้า
         </Typography>
         <form onSubmit={handleSubmit}>
           {/* <form> */}
@@ -183,7 +222,9 @@ export default function edit() {
                     variant="body2"
                     sx={{ marginTop: 5, fontSize: "14px", color: "red" }}
                   >
-                    แนะนำให้เป็นไฟล์ png หรือ jpeg ขนาด 300x338 เท่านั้น.
+                    แนะนำให้เป็นไฟล์ png หรือ jpeg ขนาด 300x338 เท่านั้น. <br />
+                    หากลบรูปเเล้ว รูปจะถูกลบออกจากฐานข้อมูลทันที
+                    จะไม่สามารถกู้คืนมาได้ กรุณาตรวจสอบก่อนลบ !!
                   </Typography>
                 </Box>
               </Box>
@@ -205,6 +246,7 @@ export default function edit() {
               handleChange={handleChange}
               fetcherWithToken={fetcherWithToken}
               setValues={setValues}
+              query={query}
             />
 
             <CardSizeDetail

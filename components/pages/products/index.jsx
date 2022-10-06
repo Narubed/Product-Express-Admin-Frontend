@@ -5,6 +5,9 @@ import "dayjs/locale/th";
 import { filter } from "lodash";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
+import { useSelector, useDispatch } from "react-redux";
+import { setLoading } from "@/lib/store/loading";
+import Swal from "sweetalert2";
 // material
 import {
   TableContainer,
@@ -21,6 +24,7 @@ import {
   TablePagination,
   Chip,
   IconButton,
+  Switch,
 } from "@mui/material";
 
 import Scrollbar from "@/lib/table/Scrollbar";
@@ -28,15 +32,16 @@ import ListHead from "@/lib/table/ListHead";
 import ListToolbar from "@/lib/table/ListToolbar";
 import SearchNotFound from "@/lib/table/SearchNotFound";
 import Image from "next/image";
-// import DeleteTypes from "./deleteTypes";
+import DeleteProduct from "./deleteProduct";
 
 const TABLE_HEAD = [
-  { id: "Thai", label: "Thai", alignRight: true },
-  { id: "Eng", label: "Eng", alignRight: false },
-  { id: "Cambodia", label: "Cambodia", alignRight: false },
-  { id: "Myanmar", label: "Myanmar", alignRight: false },
-  { id: "Laos", label: "Laos", alignRight: false },
-  { id: "China", label: "China", alignRight: false },
+  { id: "รายชื่อสินค้า", label: "รายชื่อสินค้า", alignRight: true },
+
+  { id: "ประเภทสินค้า", label: "ประเภทสินค้า", alignRight: false },
+
+  { id: "product_tag", label: "Tag", alignRight: false },
+  { id: "Status", label: "สถานะ", alignRight: false },
+
   { id: "" },
 ];
 
@@ -68,16 +73,11 @@ function applySortFilter(array, comparator, query) {
     return filter(
       array,
       (_user) =>
-        _user.type_name.Thai.toLowerCase().indexOf(query.toLowerCase()) !==
+        _user.product_name.Eng.toLowerCase().indexOf(query.toLowerCase()) !==
           -1 ||
-        _user.type_name.Eng.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _user.type_name.Cambodia.toLowerCase().indexOf(query.toLowerCase()) !==
+        _user.product_name.Thai.toLowerCase().indexOf(query.toLowerCase()) !==
           -1 ||
-        _user.type_name.Myanmar.toLowerCase().indexOf(query.toLowerCase()) !==
-          -1 ||
-        _user.type_name.Laos.toLowerCase().indexOf(query.toLowerCase()) !==
-          -1 ||
-        _user.type_name.China.toLowerCase().indexOf(query.toLowerCase()) !== -1
+        _user.product_tag.toLowerCase().indexOf(query.toLowerCase()) !== -1
     );
   }
 
@@ -85,7 +85,9 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function Products() {
+  const dispatch = useDispatch();
   const { fetcherWithToken, currentUser } = useCurrentUser();
+  const [isProducts, setProducts] = useState([]);
   const [isTypes, setTypes] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -99,13 +101,23 @@ export default function Products() {
 
   useEffect(() => {
     if (currentUser) {
+      fetcherProducts();
       fetcherTypes();
     }
   }, [currentUser]);
 
-  const fetcherTypes = async () => {
-    const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/type`;
+  const fetcherProducts = async () => {
+    const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/products`;
     await fetcherWithToken(url)
+      .then((json) => {
+        setProducts(json.data);
+      })
+      .catch(() => setProducts([]));
+  };
+
+  const fetcherTypes = async () => {
+    const urlTypes = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/type`;
+    await fetcherWithToken(urlTypes)
       .then((json) => {
         setTypes(json.data);
       })
@@ -120,7 +132,7 @@ export default function Products() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = isTypes.map((n) => n._id);
+      const newSelecteds = isProducts.map((n) => n._id);
       setSelected(newSelecteds);
 
       return;
@@ -141,10 +153,32 @@ export default function Products() {
     setFilterName(event.target.value);
   };
 
+  const handleSwicthStatus = async (props) => {
+    dispatch(setLoading(true));
+    const { row, event } = props;
+    const data = {
+      product_status: event.target.checked,
+    };
+    const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/products/${row._id}`;
+    await fetcherWithToken(url, { method: "PUT", body: JSON.stringify(data) })
+      .then((json) => {
+        dispatch(setLoading(false));
+        fetcherProducts();
+      })
+      .catch(() => {
+        dispatch(setLoading(false));
+        Swal.fire({
+          icon: "error",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
+  };
+
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - isTypes.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - isProducts.length) : 0;
   const filteredList = applySortFilter(
-    isTypes,
+    isProducts,
     getComparator(order, orderBy),
     filterName
   );
@@ -187,7 +221,7 @@ export default function Products() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={isTypes.length}
+                  rowCount={isProducts.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -196,7 +230,16 @@ export default function Products() {
                   {filteredList
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
-                      const { _id, type_image, type_name } = row;
+                      const {
+                        _id,
+                        product_images,
+                        product_name,
+                        product_detail,
+                        product_size_name,
+                        product_status,
+                        product_tag,
+                        product_type_id,
+                      } = row;
                       const isItemSelected = selected.indexOf(_id) !== -1;
 
                       return (
@@ -216,8 +259,8 @@ export default function Products() {
                               spacing={2}
                             >
                               <Image
-                                alt={`${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/static/images/type/${type_image}`}
-                                src={`${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/static/images/type/${type_image}`}
+                                alt={`${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/static/images/products/${product_images[0]}`}
+                                src={`${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/static/images/products/${product_images[0]}`}
                                 width={40}
                                 height={40}
                                 objectFit="cover"
@@ -225,7 +268,7 @@ export default function Products() {
                               />
                               <Typography variant="subtitle2" noWrap>
                                 <div style={{ color: "orange" }}>
-                                  {type_name.Thai}
+                                  {product_name.Eng}
                                 </div>
                                 <div
                                   style={{
@@ -233,20 +276,23 @@ export default function Products() {
                                     fontSize: "14px",
                                   }}
                                 >
-                                  {type_name.Thai}
+                                  {product_name.Thai}
                                 </div>
                               </Typography>
                             </Stack>
                           </TableCell>
+
                           <TableCell>
-                            <div
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: "14px",
-                              }}
-                            >
-                              {type_name.Eng}
-                            </div>
+                            {product_type_id.map((item) => {
+                              const value = isTypes.find(
+                                (value) => value._id === item
+                              );
+                              return (
+                                <a key={item}>
+                                  {value?.type_name?.Thai} <br />
+                                </a>
+                              );
+                            })}
                           </TableCell>
                           <TableCell>
                             <div
@@ -255,43 +301,34 @@ export default function Products() {
                                 fontSize: "14px",
                               }}
                             >
-                              {type_name.Cambodia}
+                              {product_tag}
                             </div>
                           </TableCell>
                           <TableCell>
                             <div
+                              display="flex"
                               style={{
-                                fontWeight: "bold",
-                                fontSize: "14px",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                justifyItems: "center",
                               }}
                             >
-                              {type_name.Myanmar}
+                              <Switch
+                                color="secondary"
+                                onChange={(event) =>
+                                  handleSwicthStatus({ event, row })
+                                }
+                                checked={product_status}
+                              />
+
+                              {product_status ? "ONLINE" : "OFFLINE"}
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: "14px",
-                              }}
-                            >
-                              {type_name.Laos}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: "14px",
-                              }}
-                            >
-                              {type_name.China}
-                            </div>
-                          </TableCell>
+
                           <TableCell display="flex">
                             <Link
                               href={{
-                                pathname: "/products/types/edit/[id]",
+                                pathname: "/products/edit/[id]",
                                 query: { id: row._id },
                               }}
                             >
@@ -306,11 +343,12 @@ export default function Products() {
                                 />
                               </IconButton>
                             </Link>
-                            {/* <DeleteTypes
+                            <DeleteProduct
                               row={row}
+                              fetcherProducts={fetcherProducts}
                               fetcherTypes={fetcherTypes}
                               fetcherWithToken={fetcherWithToken}
-                            /> */}
+                            />
                           </TableCell>
                         </TableRow>
                       );
