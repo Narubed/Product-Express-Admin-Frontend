@@ -5,6 +5,10 @@ import { Provider } from "react-redux";
 import Helmet from "react-helmet";
 
 import Layout from "~/components/layout";
+import "primereact/resources/themes/bootstrap4-light-purple/theme.css";  //theme
+import "primereact/resources/primereact.min.css";                  //core css
+import "primeicons/primeicons.css";     
+
 
 function MyApp({ Component, pageProps }) {
   return (

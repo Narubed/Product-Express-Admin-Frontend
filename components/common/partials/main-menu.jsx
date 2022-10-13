@@ -7,13 +7,16 @@ import Image from "next/image";
 
 function MainMenu() {
   const pathname = useRouter().pathname;
+  console.log(pathname.includes("/products"));
   const { logout } = useCurrentUser();
   return (
     <nav className="main-nav mr-4">
       <ul className="menu menu-active-underline">
         <li id="menu-home" className={pathname === "/" ? "active" : ""}>
           <Link href="/">
-            <a>Home</a>
+            <a >
+              Home
+            </a>
           </Link>
         </li>
 
