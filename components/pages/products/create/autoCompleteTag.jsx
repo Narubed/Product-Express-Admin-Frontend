@@ -72,5 +72,5 @@ const top100Films = [
   { label: "ไม่มี" },
   { label: "Hot" },
   { label: "New" },
-  { label: "ลดพิเศษ" },
+  { label: "Sale" },
 ];
