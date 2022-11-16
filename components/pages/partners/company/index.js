@@ -337,7 +337,22 @@ export default function Blogs() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            sx={{
+              ".MuiTablePagination-toolbar": {
+                fontSize: 16,
+                backgroundColor: "rgb(222,222,222)",
+                color: "rgb(41, 39, 39)",
+              },
+              ".MuiTablePagination-displayedRows": {
+                fontSize: 16,
+                m: "auto",
+              },
+              ".MuiTablePagination-selectLabel": {
+                fontSize: 16,
+                m: "auto",
+              },
+            }}
+            rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"
             count={filteredList.length}
             rowsPerPage={rowsPerPage}

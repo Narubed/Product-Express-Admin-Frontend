@@ -250,53 +250,6 @@ function MobileMenu(props) {
           </li>
 
           <li>
-            <Card title="Blog" type="mobile" url="/blog/classic">
-              <ul>
-                {mainMenu.blog.map((item, index) =>
-                  item.subPages ? (
-                    <li key={"blog" + item.title}>
-                      <Card
-                        title={item.title}
-                        url={"/" + item.url}
-                        type="mobile"
-                      >
-                        <ul>
-                          {item.subPages.map((item, index) => (
-                            <li key={`blog-${item.title}`}>
-                              <Link href={"/" + item.url}>{item.title}</Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </Card>
-                    </li>
-                  ) : (
-                    <li
-                      key={"blog" + item.title}
-                      className={item.subPages ? "submenu" : ""}
-                    >
-                      <Link href={"/" + item.url}>{item.title}</Link>
-                    </li>
-                  )
-                )}
-              </ul>
-            </Card>
-          </li>
-
-          <li>
-            <Card title="elements" type="mobile" url="/elements">
-              <ul>
-                {mainMenu.element.map((item, index) => (
-                  <li key={`elements-${item.title}`}>
-                    <Link href={"/" + item.url}>
-                      <a>{item.title}</a>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </li>
-
-          <li>
             <Link href="/">Buy Riode!</Link>
           </li>
           <li>

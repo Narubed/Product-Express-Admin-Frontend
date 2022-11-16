@@ -1,10 +1,17 @@
-import useCurrentUser from "@/lib/hook/useCurrentUser";
-import { useEffect, useState } from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import { filter } from "lodash";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
+import { useSelector, useDispatch } from "react-redux";
+
+import useCurrentUser from "@/lib/hook/useCurrentUser";
+import numeral from "numeral";
+import Main from "@/components/main";
+
+import Swal from "sweetalert2";
 // material
 import {
   TableContainer,
@@ -21,28 +28,23 @@ import {
   TablePagination,
   Chip,
   IconButton,
+  Tooltip,
   Switch,
 } from "@mui/material";
-import { useSelector, useDispatch } from "react-redux";
-import { setLoading } from "@/lib/store/loading";
+
 import Scrollbar from "@/lib/table/Scrollbar";
 import ListHead from "@/lib/table/ListHead";
 import ListToolbar from "@/lib/table/ListToolbar";
 import SearchNotFound from "@/lib/table/SearchNotFound";
-import Image from "next/image";
-import DeleteBrand from "@/components/pages/partners/brand/deleteBrand";
-import Swal from "sweetalert2";
 
 const TABLE_HEAD = [
-  { id: "partner_name", label: "ชื่อ", alignRight: false },
-  { id: "partner_email", label: "อีเมล", alignRight: false },
-  { id: "partner_phone", label: "เบอร์โทรศัพท์", alignRight: false },
-  {
-    id: "partner_name_center",
-    label: "ชื่อที่แสดงให้ผู้ใช้เห็น",
-    alignRight: false,
-  },
-  { id: "status", label: "สถานะ", alignRight: false },
+  { id: "_id", label: "รหัสการตัดรอบ", alignRight: false },
+
+  { id: "partner_name", label: "ชื่อพาร์ทเนอร์", alignRight: false },
+
+  { id: "cutaround_timestamp", label: "วันที่ทำการตัดรอบ", alignRight: false },
+  { id: "cutaround_transaction", label: "ผู้ทำการตัดรอบ", alignRight: false },
+
   { id: "" },
 ];
 
@@ -74,30 +76,21 @@ function applySortFilter(array, comparator, query) {
     return filter(
       array,
       (_user) =>
-        _user.partner_name.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _user.partner_email.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        _user.partner_phone.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-        // _user.brand_name.Eng.toLowerCase().indexOf(query.toLowerCase()) !==
-        //   -1 ||
-        // _user.brand_name.Cambodia.toLowerCase().indexOf(query.toLowerCase()) !==
-        //   -1 ||
-        // _user.brand_name.Myanmar.toLowerCase().indexOf(query.toLowerCase()) !==
-        //   -1 ||
-        // _user.brand_name.Laos.toLowerCase().indexOf(query.toLowerCase()) !==
-        //   -1 ||
-        _user.partner_name_center.Thai.toLowerCase().indexOf(
-          query.toLowerCase()
-        ) !== -1
+        _user._id.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        _user.cutaround_transaction
+          .toLowerCase()
+          .indexOf(query.toLowerCase()) !== -1 ||
+        _user.partner_name.toLowerCase().indexOf(query.toLowerCase()) !== -1
     );
   }
 
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function Blogs() {
+export default function index() {
   const dispatch = useDispatch();
   const { fetcherWithToken, currentUser } = useCurrentUser();
-  const [isPartners, setPartners] = useState([]);
+  const [isCutAround, setCutAround] = useState([]);
 
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
@@ -106,20 +99,47 @@ export default function Blogs() {
   const [filterName, setFilterName] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  if (!currentUser) {
+    return (
+      <div>
+        <Main />
+      </div>
+    );
+  }
   useEffect(() => {
     if (currentUser) {
-      fetcherPartners();
+      fetchCutArount();
     }
   }, [currentUser]);
-
-  const fetcherPartners = async () => {
-    const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/partners`;
-    await fetcherWithToken(url)
-      .then((json) => {
-        console.log(json);
-        setPartners(json.data);
-      })
-      .catch(() => setPartners([]));
+  const fetchCutArount = async () => {
+    try {
+      const urlPartners = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/partners`;
+      const urlCutAround = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/cut_around`;
+      let partners = [];
+      let cutAround = [];
+      await fetcherWithToken(urlPartners).then(async (json) => {
+        partners = json.data;
+      });
+      await fetcherWithToken(urlCutAround).then(async (json) => {
+        cutAround = json.data;
+      });
+      const newCutAround = [];
+      cutAround.forEach((element) => {
+        const findPartner = partners.find(
+          (item) => item._id === element.cutaround_partner_id
+        );
+        if (findPartner) {
+          newCutAround.push({
+            ...element,
+            partner_name: findPartner.partner_name,
+          });
+        }
+      });
+      console.log(newCutAround);
+      setCutAround(newCutAround.reverse());
+    } catch (err) {
+      setCutAround([]);
+    }
   };
 
   const handleRequestSort = (event, property) => {
@@ -130,7 +150,7 @@ export default function Blogs() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = isPartners.map((n) => n._id);
+      const newSelecteds = isCutAround.map((n) => n._id);
       setSelected(newSelecteds);
 
       return;
@@ -150,42 +170,19 @@ export default function Blogs() {
   const handleFilterByName = (event) => {
     setFilterName(event.target.value);
   };
-
-  const handleSwicthStatus = async (props) => {
-    dispatch(setLoading(true));
-    const { row, event } = props;
-    const data = {
-      partner_status: event.target.checked,
-    };
-    const url = `${process.env.NEXT_PUBLIC_PRODUCT_EXPRESS_BACKEND}/partners/${row._id}`;
-    await fetcherWithToken(url, { method: "PUT", body: JSON.stringify(data) })
-      .then((json) => {
-        dispatch(setLoading(false));
-        fetcherPartners();
-      })
-      .catch(() => {
-        dispatch(setLoading(false));
-        Swal.fire({
-          icon: "error",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      });
-  };
-
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - isPartners.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - isCutAround.length) : 0;
   const filteredList = applySortFilter(
-    isPartners,
+    isCutAround,
     getComparator(order, orderBy),
     filterName
   );
-
   const isUserNotFound = filteredList.length === 0;
 
   return (
     <div>
-      <Container sx={{ pt: 2, pb: 6 }}>
+      {" "}
+      <Container>
         <Stack
           direction="row"
           alignItems="center"
@@ -193,17 +190,8 @@ export default function Blogs() {
           mb={4}
         >
           <Typography variant="h4" gutterBottom sx={{ mt: "16px" }}>
-            รายชื่อพาร์ทเนอร์ (Store)
+            รายงานการตัดรอบทั้งหมด
           </Typography>
-          <Link href={"/partners/store/create"}>
-            <Button
-              variant="contained"
-              color="secondary"
-              sx={{ fontSize: "12px" }}
-            >
-              เพิ่มพาร์ทเนอร์
-            </Button>
-          </Link>
         </Stack>
         <Card>
           <ListToolbar
@@ -219,7 +207,7 @@ export default function Blogs() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={isPartners.length}
+                  rowCount={isCutAround.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -231,11 +219,8 @@ export default function Blogs() {
                       const {
                         _id,
                         partner_name,
-                        partner_email,
-                        partner_status,
-                        partner_phone,
-                        partner_address,
-                        partner_name_center,
+                        cutaround_timestamp,
+                        cutaround_transaction,
                       } = row;
                       const isItemSelected = selected.indexOf(_id) !== -1;
 
@@ -250,102 +235,73 @@ export default function Blogs() {
                         >
                           <TableCell />
                           <TableCell>
-                            <Stack
-                              direction="row"
-                              alignItems="center"
-                              spacing={2}
-                            >
-                              <Typography variant="subtitle2" noWrap>
-                                <div
-                                  style={{
-                                    fontWeight: "bold",
-                                    fontSize: "14px",
-                                  }}
-                                >
-                                  {partner_address.Thai}
-                                </div>
-                                <div style={{ color: "orange" }}>
-                                  {partner_name}
-                                </div>
-                              </Typography>
-                            </Stack>
-                          </TableCell>
-                          <TableCell>
                             <div
                               style={{
                                 fontWeight: "bold",
                                 fontSize: "14px",
                               }}
                             >
-                              {partner_email}
+                              {_id}
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: "14px",
-                              }}
-                            >
-                              {partner_phone}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div
-                              style={{
-                                fontWeight: "bold",
-                                fontSize: "14px",
-                              }}
-                            >
-                              {partner_name_center.Thai}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div
-                              display="flex"
-                              style={{
-                                alignItems: "center",
-                                justifyContent: "center",
-                                justifyItems: "center",
-                              }}
-                            >
-                              <Switch
-                                color="secondary"
-                                onChange={(event) =>
-                                  handleSwicthStatus({ event, row })
-                                }
-                                checked={partner_status}
-                              />
 
-                              {partner_status ? "ONLINE" : "OFFLINE"}
+                          <TableCell>
+                            <div
+                              style={{
+                                fontWeight: "bold",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {partner_name}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div
+                              style={{
+                                fontWeight: "bold",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {dayjs(cutaround_timestamp)
+                                .locale("th")
+                                .add(543, "year")
+                                .format("DD MMMM YYYY HH:mm")}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div
+                              style={{
+                                fontWeight: "bold",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {cutaround_transaction}
                             </div>
                           </TableCell>
 
                           <TableCell display="flex">
                             <Link
                               href={{
-                                pathname: "/partners/store/edit/[id]",
+                                pathname: "/report/old-cut-around/detail/[id]",
                                 query: {
                                   id: row._id,
+                                  partner_name: partner_name,
                                 },
                               }}
                             >
-                              <IconButton
-                                color="secondary"
-                                aria-label="add an alarm"
-                              >
-                                <Icon
-                                  icon="ooui:recent-changes-ltr"
-                                  width="24"
-                                  height="24"
-                                />
-                              </IconButton>
+                              <Tooltip title="ดูรายละเอียดการตัดรอบ">
+                                <IconButton
+                                  color="secondary"
+                                  aria-label="add an alarm"
+                                >
+                                  <Icon
+                                    icon="ooui:recent-changes-ltr"
+                                    width="24"
+                                    height="24"
+                                  />
+                                </IconButton>
+                              </Tooltip>
                             </Link>
-                            {/* <DeleteBrand
-                              row={row}
-                              fetcherBrand={fetcherBrand}
-                              fetcherWithToken={fetcherWithToken}
-                            /> */}
                           </TableCell>
                         </TableRow>
                       );

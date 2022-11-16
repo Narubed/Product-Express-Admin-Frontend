@@ -145,7 +145,6 @@ export default function create() {
   };
 
   const onChangeBookBank = (file) => {
-    console.log("onChangeBookBank");
     const reader = new FileReader();
     const { files } = file.target;
     if (files && files.length !== 0) {

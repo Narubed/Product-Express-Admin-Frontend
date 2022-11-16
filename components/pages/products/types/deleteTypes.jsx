@@ -3,22 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 // material
-import {
-  TableContainer,
-  Table,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Button,
-  Stack,
-  Typography,
-  Container,
-  Card,
-  TablePagination,
-  Chip,
-  IconButton,
-} from "@mui/material";
+import { IconButton } from "@mui/material";
 import Swal from "sweetalert2";
 
 function deleteTypes({ row, fetcherTypes, fetcherWithToken }) {
