@@ -5,12 +5,13 @@ import { Provider } from "react-redux";
 import Helmet from "react-helmet";
 
 import Layout from "~/components/layout";
-import "primereact/resources/themes/bootstrap4-light-purple/theme.css";  //theme
-import "primereact/resources/primereact.min.css";                  //core css
-import "primeicons/primeicons.css";     
-
+import "primereact/resources/themes/bootstrap4-light-purple/theme.css"; //theme
+import "primereact/resources/primereact.min.css"; //core css
+import "primeicons/primeicons.css";
 
 function MyApp({ Component, pageProps }) {
+  if (process.env.NODE_ENV !== "development")
+    console.log = console.warn = console.error = () => {};
   return (
     <Provider store={store}>
       <Helmet>
